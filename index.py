@@ -9,7 +9,8 @@ app = Flask(__name__)
 @app.route('/block-screens/<block_screen_name>')
 def render_block_screen(block_screen_name):
     block_screens = {
-        "default"
+        "default",
+        "minimalist"
     }
     message = request.args.get("message", "You're not allowed to enter this site")
     if block_screen_name not in block_screens:
