@@ -20,10 +20,11 @@ def render_block_screen(block_screen_name):
 @app.route('/create-pin')
 def create_pin():
     pin = generate_pin()
+    html = render_template('emails/PIN.html', pin=pin)
     to_address = request.args.get("email")
     if not to_address:
         return {"message": "No email address included"}, 400
-    Gmail.send_email(environ["GMAIL_USERNAME"], environ["GMAIL_APP_PASSWORD"], to_address, "Liberty Arrow pin", pin)
+    Gmail.send_email(environ["GMAIL_USERNAME"], environ["GMAIL_APP_PASSWORD"], to_address, "Liberty Arrow pin", html)
     return pin
 
 if __name__ == "__main__":

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>LibertyArrow PIN</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: white;
+            }
+
+            header {
+                border-bottom: 1px solid #545aa7;
+            }
+
+            main {
+                word-wrap: break-word;
+            }
+
+            footer {
+                border-top: 1px solid #545aa7;
+                font-size: 0.9rem;
+            }
+
+            h1,
+            p {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            h1 {
+                font-weight: bold;
+                font-size: 2rem;
+            }
+
+            p {
+                font-weight: normal;
+                font-size: 1rem;
+            }
+
+            .content-wrapper {
+                width: 75%;
+                margin: 0 auto;
+                padding: 10px 0;
+            }
+
+            #pin {
+                font-size: 2rem;
+                display: block;
+                text-align: center;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <header>
+                <div class="content-wrapper">
+                    <p align="center">
+                        <img src="https://liberty-arrow-backend.vercel.app/static/images/Liberty_Arrow_text-false.png"
+                            width="5%">
+                    </p>
+                </div>
+            </header>
+            <main>
+                <div class="content-wrapper">
+                    <h1>Your Liberty Arrow PIN</h1>
+                    <p>Dear user,</p>
+                    <p>You have requested a PIN to log in into your LibertyArrow instance.</p>
+                    <br>
+                    <p>This is your Liberty Arrow PIN:</p>
+                    <span id="pin">{{ pin }}</span>
+                    <br>
+                    <p>
+                        If you did not perform this operation, you may ignore this message. If you have
+                        never registered to LibertyArrow, other person may have registered with your
+                        email by accident. If this is the case, please contact us at
+                        <a href="emailto:garystriving@gmail.com">garystriving@gmail.com</a> and we will
+                        block emails sent to your email address.
+                    </p>
+                </div>
+            </main>
+            <footer>
+                <div class="content-wrapper">
+                    <p align="center">
+                        Made with love and JavaScript by Gary Strivin'.
+                        If you like LibertyArrow,
+                        <a href="https://addons.mozilla.org/en-US/firefox/addon/liberty-arrow/">please rate us</a>.
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </body>
+</html>
