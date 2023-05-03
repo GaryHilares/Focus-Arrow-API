@@ -17,8 +17,8 @@ def render_block_screen(block_screen_name):
         block_screen_name = "default"
     return render_template(f'block-screens/{block_screen_name}.html', message=message)
 
-@app.route('/create-pin')
-def create_pin():
+@app.route('/email-code')
+def email_code():
     pin = generate_pin()
     html = render_template('emails/PIN.html', pin=pin)
     to_address = request.args.get("email")
