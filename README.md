@@ -1,4 +1,4 @@
-## Liberty Arrow Backend
+<h1 align="center">Liberty Arrow Backend</h1>
 
 <p align="center">
   <img alt="badge-lastcommit" src="https://img.shields.io/github/last-commit/GaryHilares/Liberty-Arrow-backend?style=for-the-badge">
