@@ -11,13 +11,13 @@ from liberty_arrow.services.repositories import (
 
 
 class AbstractUnitOfWork(ABC):
-    @abstractmethod
     @property
+    @abstractmethod
     def verified_emails() -> AbstractVerifiedEmailRepository:
         raise NotImplementedError
 
-    @abstractmethod
     @property
+    @abstractmethod
     def email_history() -> AbstractEmailHistoryRepository:
         raise NotImplementedError
 

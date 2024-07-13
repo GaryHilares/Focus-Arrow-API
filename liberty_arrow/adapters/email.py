@@ -9,7 +9,7 @@ class AbstractEmailClient(ABC):
         raise NotImplementedError
 
 
-class GmailClient(EmailClient):
+class GmailClient(AbstractEmailClient):
     def __init__(self, username: str, password: str) -> None:
         self.username = username
         self.password = password

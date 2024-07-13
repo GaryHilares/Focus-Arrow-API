@@ -27,7 +27,7 @@ class MongoVerifiedEmailRepository(AbstractVerifiedEmailRepository):
             self._collection.insert_one({"address": entry.address})
 
 
-def AbstractEmailHistoryRepository(ABC):
+class AbstractEmailHistoryRepository(ABC):
     @abstractmethod
     def add_record(self, entry: VerificationEmailHistoryEntry) -> None:
         raise NotImplementedError
