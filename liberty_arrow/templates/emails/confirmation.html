@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>LibertyArrow PIN</title>
+        <title>Confirm your email for Liberty Arrow</title>
         <style>
             body {
                 margin: 0;
@@ -45,8 +45,7 @@
                 padding: 10px 0;
             }
 
-            #pin {
-                font-size: 2rem;
+            #token-url {
                 display: block;
                 text-align: center;
                 font-weight: bold;
@@ -65,20 +64,16 @@
             </header>
             <main>
                 <div class="content-wrapper">
-                    <h1>Your Liberty Arrow PIN</h1>
+                    <h1>Confirm your email</h1>
                     <p>Dear user,</p>
-                    <p>You have requested a PIN to log in into your LibertyArrow instance.</p>
+                    <p>You have been requested to use this email for Liberty Arrow.</p>
                     <br>
-                    <p>This is your Liberty Arrow PIN:</p>
-                    <span id="pin">{{ pin }}</span>
+                    <p>To confirm your email, please follow this link:</p>
+                    <span id="token-url">https://liberty-arrow-backend.vercel.app/confirm-email?token={{ token }}</span>
                     <br>
-                    <p>
-                        If you did not perform this operation, you may ignore this message. If you have
-                        never registered to LibertyArrow, other person may have registered with your
-                        email by accident. If this is the case, please contact us at
-                        <a href="emailto:garystriving@gmail.com">garystriving@gmail.com</a> and we will
-                        block emails sent to your email address.
-                    </p>
+                    <p>If you did not make this request, you can ignore this email.
+                        If you do not want to receive emails from Liberty Arrow, email us at dev.garyhilares@gmail.com
+                        and we will block further emails from reaching your account.</p>
                 </div>
             </main>
             <footer>
