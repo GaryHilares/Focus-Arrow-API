@@ -45,7 +45,7 @@ class MongoUnitOfWork(AbstractUnitOfWork):
         return self._email_history
 
     def add_message(self, message: Command) -> None:
-        self.messages.push(message)
+        self.messages.append(message)
 
     def flush_messages(self) -> List[Command]:
         ret = self.messages

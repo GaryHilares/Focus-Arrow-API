@@ -1,21 +1,21 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Command:
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class SendConfirmationEmail(Command):
     address: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class ConfirmEmail(Command):
     code: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class SendCodeToEmail(Command):
     address: str

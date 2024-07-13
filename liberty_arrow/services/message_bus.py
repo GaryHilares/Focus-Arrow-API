@@ -23,6 +23,6 @@ class MessageBus:
         while not messages.empty():
             to_handle = messages.pop(0)
             if isinstance(to_handle, Command):
-                results.push(self.handle_command(to_handle))
+                results.append(self.handle_command(to_handle))
             messages.extend(self.uow.flush_messages())
         return results

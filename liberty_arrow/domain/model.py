@@ -2,7 +2,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class VerifiedEmailEntry:
     """
     Records an email that is verified to receive emails from Liberty Arrow.
@@ -11,7 +11,7 @@ class VerifiedEmailEntry:
     address: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class VerificationEmailHistoryEntry:
     """
     Records the last time that an email was sent by Liberty Arrow to the given address.

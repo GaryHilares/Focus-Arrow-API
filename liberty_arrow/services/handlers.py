@@ -25,7 +25,7 @@ def send_confirmation_email(
     ):
         return
     token = token_generator.generate()
-    content = render_template("emails/confirmation.html", token=token)
+    content = token  # TODO: render_template("emails/confirmation.html", token=token)
     email_client.send(command.address, "Confirm your Liberty Arrow token", content)
     uow.email_history.add_record(
         VerificationEmailHistoryEntry(command.address, datetime.now(), token)
@@ -48,6 +48,6 @@ def send_code_email(
     if not uow.verified_emails.contains(command.address):
         return
     token = token_generator.generate()
-    content = render_template("emails/token.html", token=token)
+    content = token  # TODO: render_template("emails/token.html", token=token)
     email_client.send(command.address, "Liberty Arrow token", content)
     return token
