@@ -52,7 +52,9 @@ class MongoEmailHistoryRepository(AbstractEmailHistoryRepository):
 
     def add_record(self, entry: VerificationEmailHistoryEntry) -> None:
         self._collection.update_one(
-            {"address": entry.address}, {"sent": entry.sent, "token": entry.token}, True
+            {"address": entry.address},
+            {"$set": {"sent": entry.sent, "token": entry.token}},
+            True,
         )
 
     def get_record_by_address(

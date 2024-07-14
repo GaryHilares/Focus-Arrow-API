@@ -34,7 +34,8 @@ def send_confirmation_email(
 
 def confirm_email(uow: AbstractUnitOfWork, command: ConfirmEmail):
     record = uow.email_history.get_record_by_token(command.code)
-    if record is None or record.sent.date() != datetime.today.date():
+    print(record)
+    if record is None or record.sent.date() != datetime.today().date():
         return
     uow.verified_emails.add(record.address)
 
