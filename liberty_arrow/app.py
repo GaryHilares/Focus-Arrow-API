@@ -7,7 +7,7 @@ from liberty_arrow.domain.commands import (
 )
 
 
-def create_app():
+def create_app() -> Flask:
     app = Flask(__name__)
 
     @app.route("/block-screens/<block_screen_name>")
