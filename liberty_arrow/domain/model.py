@@ -20,3 +20,15 @@ class VerificationEmailHistoryEntry:
     address: str
     sent: datetime
     token: str
+
+
+class ConfirmationEmailRateExceeded(Exception):
+    pass
+
+
+class ConfirmationLinkNotValid(Exception):
+    pass
+
+
+class EmailNotVerified(Exception):
+    pass

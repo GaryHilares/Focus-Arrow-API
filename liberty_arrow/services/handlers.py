@@ -2,7 +2,13 @@ from datetime import datetime
 from liberty_arrow.adapters.token import AbstractTokenGenerator
 from liberty_arrow.adapters.email import AbstractEmailClient
 from liberty_arrow.adapters.templates import AbstractTemplateRenderer
-from liberty_arrow.domain.model import VerificationEmailHistoryEntry, VerifiedEmailEntry
+from liberty_arrow.domain.model import (
+    ConfirmationEmailRateExceeded,
+    ConfirmationLinkNotValid,
+    EmailNotVerified,
+    VerificationEmailHistoryEntry,
+    VerifiedEmailEntry,
+)
 from liberty_arrow.services.uow import AbstractUnitOfWork
 from liberty_arrow.domain.commands import (
     SendConfirmationEmail,
@@ -23,7 +29,7 @@ def send_confirmation_email(
         email_history_record is not None
         and email_history_record.sent.date() == datetime.today().date()
     ):
-        return
+        raise ConfirmationEmailRateExceeded
     token = token_generator.generate()
     content = template_renderer.render("emails/confirmation.html", token=token)
     email_client.send(command.address, "Confirm your Liberty Arrow token", content)
@@ -35,7 +41,7 @@ def send_confirmation_email(
 def confirm_email(uow: AbstractUnitOfWork, command: ConfirmEmail):
     record = uow.email_history.get_record_by_token(command.code)
     if record is None or record.sent.date() != datetime.today().date():
-        return
+        raise ConfirmationLinkNotValid
     uow.verified_emails.add(VerifiedEmailEntry(record.address))
 
 
@@ -47,7 +53,7 @@ def send_code_email(
     command: SendCodeToEmail,
 ):
     if not uow.verified_emails.contains(VerifiedEmailEntry(command.address)):
-        return
+        raise EmailNotVerified
     token = token_generator.generate()
     content = template_renderer.render("emails/token.html", token=token)
     email_client.send(command.address, "Liberty Arrow token", content)
