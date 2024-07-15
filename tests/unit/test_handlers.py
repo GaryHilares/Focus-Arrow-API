@@ -1,5 +1,4 @@
 from audioop import add
-import email
 from typing import Literal, List, Optional
 from liberty_arrow.adapters.email import AbstractEmailClient
 from liberty_arrow.adapters.templates import AbstractTemplateRenderer
@@ -10,13 +9,20 @@ from liberty_arrow.domain.commands import (
     SendCodeToEmail,
     SendConfirmationEmail,
 )
-from liberty_arrow.domain.model import VerificationEmailHistoryEntry, VerifiedEmailEntry
+from liberty_arrow.domain.model import (
+    ConfirmationEmailRateExceeded,
+    ConfirmationLinkNotValid,
+    EmailNotVerified,
+    VerificationEmailHistoryEntry,
+    VerifiedEmailEntry,
+)
 from liberty_arrow.services import handlers
 from liberty_arrow.services.repositories import (
     AbstractEmailHistoryRepository,
     AbstractVerifiedEmailRepository,
 )
 from liberty_arrow.services.uow import AbstractUnitOfWork
+import pytest
 
 
 class FakeEmailClient(AbstractEmailClient):
@@ -97,19 +103,15 @@ class FakeTemplateRenderer(AbstractTemplateRenderer):
         return f"{template_name}: {kwargs}"
 
 
-def test_sends_confirmation_email_once_per_day():
+def test_sends_confirmation_email():
     email_client = FakeEmailClient()
     token_generator = FakeTokenGenerator()
     template_renderer = FakeTemplateRenderer()
     uow = FakeUnitOfWork()
-    commands = [
-        SendConfirmationEmail("user@example.com"),
-        SendConfirmationEmail("user@example.com"),
-    ]
-    for command in commands:
-        handlers.send_confirmation_email(
-            email_client, token_generator, template_renderer, uow, command
-        )
+    command = SendConfirmationEmail("user@example.com")
+    handlers.send_confirmation_email(
+        email_client, token_generator, template_renderer, uow, command
+    )
     sent_one = len(email_client.sent) == 1
     email = email_client.sent[0] if sent_one else None
     assert sent_one
@@ -141,10 +143,11 @@ def test_does_not_spam_confirmation_email_to_same_user():
     token_generator = FakeTokenGenerator()
     template_renderer = FakeTemplateRenderer()
     command = SendConfirmationEmail("bob@example.com")
-    for _ in range(1000):
-        handlers.send_confirmation_email(
-            email_client, token_generator, template_renderer, uow, command
-        )
+    with pytest.raises(ConfirmationEmailRateExceeded):
+        for _ in range(1000):
+            handlers.send_confirmation_email(
+                email_client, token_generator, template_renderer, uow, command
+            )
     assert len(email_client.sent) <= 10
 
 
@@ -160,7 +163,8 @@ def test_does_not_confirms_email_with_non_existing_token():
         uow,
         SendConfirmationEmail("bob@example.com"),
     )
-    handlers.confirm_email(uow, ConfirmEmail("NON_EXISTING_TOKEN"))
+    with pytest.raises(ConfirmationLinkNotValid):
+        handlers.confirm_email(uow, ConfirmEmail("NON_EXISTING_TOKEN"))
     assert not uow.verified_emails.contains("bob@example.com")
 
 
@@ -177,7 +181,7 @@ def test_confirms_email_with_right_token():
         SendConfirmationEmail("bob@example.com"),
     )
     handlers.confirm_email(uow, ConfirmEmail("FAKE_TOKEN"))
-    assert uow.verified_emails.contains("bob@example.com")
+    assert uow.verified_emails.contains(VerifiedEmailEntry("bob@example.com"))
 
 
 def test_sends_code_to_verified_email():
@@ -193,7 +197,6 @@ def test_sends_code_to_verified_email():
         SendConfirmationEmail("bob@example.com"),
     )
     handlers.confirm_email(uow, ConfirmEmail("FAKE_TOKEN"))
-    print(uow.verified_emails.collection)
     code = handlers.send_code_email(
         email_client,
         token_generator,
@@ -201,7 +204,6 @@ def test_sends_code_to_verified_email():
         uow,
         SendCodeToEmail("bob@example.com"),
     )
-    print(email_client.sent)
     assert "bob@example.com" == email_client.sent[0]["to_address"]
     assert code in email_client.sent[0]["content"]
 
@@ -211,11 +213,12 @@ def test_does_not_send_code_to_unverified_email():
     email_client = FakeEmailClient()
     token_generator = FakeTokenGenerator()
     template_renderer = FakeTemplateRenderer()
-    handlers.send_code_email(
-        email_client,
-        token_generator,
-        template_renderer,
-        uow,
-        SendCodeToEmail("bob@example.com"),
-    )
+    with pytest.raises(EmailNotVerified):
+        handlers.send_code_email(
+            email_client,
+            token_generator,
+            template_renderer,
+            uow,
+            SendCodeToEmail("bob@example.com"),
+        )
     assert len(email_client.sent) == 0

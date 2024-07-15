@@ -2,22 +2,28 @@ import datetime
 import pytest
 from liberty_arrow.domain.model import VerificationEmailHistoryEntry, VerifiedEmailEntry
 from liberty_arrow.services import repositories
-from dotenv import dotenv_values
+from dotenv import load_dotenv
+from os import getenv
 from pymongo import MongoClient
 
 
 @pytest.fixture
+def load_env():
+    load_dotenv(".env")
+
+
+@pytest.mark.usefixtures("load_env")
+@pytest.fixture
 def verified_email_repo() -> repositories.MongoVerifiedEmailRepository:
-    config = dotenv_values(".env")
-    URL = f"mongodb+srv://{config['MONGODB_USER']}:{config['MONGODB_PASSWORD']}@{config['MONGODB_HOST']}/?retryWrites=true&w=majority"
+    URL = f"mongodb+srv://{getenv('MONGODB_USER')}:{getenv('MONGODB_PASSWORD')}@{getenv('MONGODB_HOST')}/?retryWrites=true&w=majority"
     conn_pool = MongoClient(URL)
     return repositories.MongoVerifiedEmailRepository(conn_pool)
 
 
+@pytest.mark.usefixtures("load_env")
 @pytest.fixture
 def email_history_repo() -> repositories.MongoEmailHistoryRepository:
-    config = dotenv_values(".env")
-    URL = f"mongodb+srv://{config['MONGODB_USER']}:{config['MONGODB_PASSWORD']}@{config['MONGODB_HOST']}/?retryWrites=true&w=majority"
+    URL = f"mongodb+srv://{getenv('MONGODB_USER')}:{getenv('MONGODB_PASSWORD')}@{getenv('MONGODB_HOST')}/?retryWrites=true&w=majority"
     conn_pool = MongoClient(URL)
     return repositories.MongoEmailHistoryRepository(conn_pool)
 
