@@ -46,7 +46,7 @@ def send_code_email(
     uow: AbstractUnitOfWork,
     command: SendCodeToEmail,
 ):
-    if not uow.verified_emails.contains(command.address):
+    if not uow.verified_emails.contains(VerifiedEmailEntry(command.address)):
         return
     token = token_generator.generate()
     content = token  # TODO: render_template("emails/token.html", token=token)

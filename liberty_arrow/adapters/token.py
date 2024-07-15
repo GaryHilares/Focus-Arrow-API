@@ -10,7 +10,7 @@ class AbstractTokenGenerator(ABC):
 
 
 class RandomTokenGenerator(AbstractTokenGenerator):
-    def generate_pin() -> str:
+    def generate(self) -> str:
         return "".join(
             [
                 random.choice(ascii_lowercase + ascii_uppercase + digits)

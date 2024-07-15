@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 from liberty_arrow import bootstrap
-from liberty_arrow.adapters.token import generate_pin
 from liberty_arrow.domain.commands import (
     ConfirmEmail,
     SendCodeToEmail,
@@ -28,7 +27,7 @@ def create_app():
             return {"message": "No email address included"}, 400
         bus = bootstrap.bootstrap()
         result = bus.handle_message(SendCodeToEmail(to_address))
-        return result
+        return {"result": result}, 201
 
     @app.route("/send-confirmation-email")
     def send_confirmation_email():
@@ -37,6 +36,7 @@ def create_app():
             return {"message": "No email address included"}, 400
         bus = bootstrap.bootstrap()
         bus.handle_message(SendConfirmationEmail(to_address))
+        return "OK", 201
 
     @app.route("/confirm-email")
     def confirm_email():
@@ -45,5 +45,6 @@ def create_app():
             return {"message": "No token included"}, 400
         bus = bootstrap.bootstrap()
         bus.handle_message(ConfirmEmail(token))
+        return "OK", 201
 
     return app

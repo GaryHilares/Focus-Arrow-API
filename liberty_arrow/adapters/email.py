@@ -14,7 +14,7 @@ class GmailClient(AbstractEmailClient):
         self.username = username
         self.password = password
 
-    def send_email(self, to_address: str, subject: str, content: str):
+    def send(self, to_address: str, subject: str, content: str):
         msg = multipart.MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = self.username

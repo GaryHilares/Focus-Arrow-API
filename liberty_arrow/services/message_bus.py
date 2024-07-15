@@ -20,7 +20,7 @@ class MessageBus:
     def handle_message(self, message: Message) -> List[Any]:
         messages = [message]
         results = []
-        while not messages.empty():
+        while len(messages) > 0:
             to_handle = messages.pop(0)
             if isinstance(to_handle, Command):
                 results.append(self.handle_command(to_handle))
