@@ -15,16 +15,15 @@ from liberty_arrow.services.handlers import (
 )
 from functools import partial
 from liberty_arrow.services.uow import MongoUnitOfWork
-from dotenv import dotenv_values
+from os import getenv
 from pymongo import MongoClient
 
 
 def bootstrap() -> MessageBus:
-    config = dotenv_values(".env")
-    URL = f"mongodb+srv://{config['MONGODB_USER']}:{config['MONGODB_PASSWORD']}@{config['MONGODB_HOST']}/?retryWrites=true&w=majority"
+    URL = f"mongodb+srv://{getenv('MONGODB_USER')}:{getenv('MONGODB_PASSWORD')}@{getenv('MONGODB_HOST')}/?retryWrites=true&w=majority"
     conn_pool = MongoClient(URL)
     uow = MongoUnitOfWork(conn_pool)
-    email_client = GmailClient(config["GMAIL_USERNAME"], config["GMAIL_APP_PASSWORD"])
+    email_client = GmailClient(getenv("GMAIL_USERNAME"), getenv("GMAIL_APP_PASSWORD"))
     pin_generator = RandomTokenGenerator()
     template_renderer = JinjaTemplateRenderer(PackageLoader("liberty_arrow"))
 
