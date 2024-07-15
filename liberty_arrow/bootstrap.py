@@ -1,5 +1,6 @@
-import email
+from jinja2 import PackageLoader
 from liberty_arrow.adapters.email import GmailClient
+from liberty_arrow.adapters.templates import JinjaTemplateRenderer
 from liberty_arrow.adapters.token import RandomTokenGenerator
 from liberty_arrow.services.message_bus import MessageBus
 from liberty_arrow.domain.commands import (
@@ -25,12 +26,15 @@ def bootstrap() -> MessageBus:
     uow = MongoUnitOfWork(conn_pool)
     email_client = GmailClient(config["GMAIL_USERNAME"], config["GMAIL_APP_PASSWORD"])
     pin_generator = RandomTokenGenerator()
+    template_renderer = JinjaTemplateRenderer(PackageLoader("liberty_arrow"))
 
     command_handlers = {
         ConfirmEmail: confirm_email,
-        SendCodeToEmail: partial(send_code_email, email_client, pin_generator),
+        SendCodeToEmail: partial(
+            send_code_email, email_client, pin_generator, template_renderer
+        ),
         SendConfirmationEmail: partial(
-            send_confirmation_email, email_client, pin_generator
+            send_confirmation_email, email_client, pin_generator, template_renderer
         ),
     }
 
