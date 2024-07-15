@@ -14,8 +14,8 @@ class MessageBus:
         self.uow = uow
         self.command_handlers = command_handlers
 
-    def handle_command(self, command: Command) -> None:
-        self.command_handlers[type(command)](self.uow, command)
+    def handle_command(self, command: Command):
+        return self.command_handlers[type(command)](self.uow, command)
 
     def handle_message(self, message: Message) -> List[Any]:
         messages = [message]

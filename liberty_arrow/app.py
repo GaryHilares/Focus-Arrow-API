@@ -27,10 +27,10 @@ def create_app():
             return {"message": "No email address included"}, 400
         bus = bootstrap.bootstrap()
         result = bus.handle_message(SendCodeToEmail(to_address))
-        return {"result": result}, 201
+        return {"result": result[0]}, 201
 
-    @app.route("/send-confirmation-email")
-    def send_confirmation_email():
+    @app.route("/email-confirmation")
+    def email_confirmation():
         to_address = request.args.get("email")
         if not to_address:
             return {"message": "No email address included"}, 400
