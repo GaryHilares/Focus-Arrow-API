@@ -17,7 +17,7 @@ class AbstractVerifiedEmailRepository(ABC):
 class MongoVerifiedEmailRepository(AbstractVerifiedEmailRepository):
     def __init__(self, conn_pool: pymongo.MongoClient):
         db_conn = conn_pool["Liberty-Arrow"]
-        self._collection = db_conn["verification-email-history"]
+        self._collection = db_conn["verified-emails"]
 
     def contains(self, entry: VerifiedEmailEntry) -> bool:
         return self._collection.find_one({"address": entry.address}) is not None
@@ -48,7 +48,7 @@ class AbstractEmailHistoryRepository(ABC):
 class MongoEmailHistoryRepository(AbstractEmailHistoryRepository):
     def __init__(self, conn_pool: pymongo.MongoClient):
         db_conn = conn_pool["Liberty-Arrow"]
-        self._collection = db_conn["verified-emails"]
+        self._collection = db_conn["verification-email-history"]
 
     def add_record(self, entry: VerificationEmailHistoryEntry) -> None:
         self._collection.update_one(
