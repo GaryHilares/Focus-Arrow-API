@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request
 from liberty_arrow import bootstrap
 from liberty_arrow.domain.commands import (
     ConfirmEmail,
@@ -33,10 +33,7 @@ def create_app() -> Flask:
         bus = bootstrap.bootstrap()
         try:
             result = bus.handle_message(SendCodeToEmail(to_address))
-            response = Response(
-                {"result": result[0]}, 201, {"Access-Control-Allow-Origin": "*"}
-            )
-            return response
+            return {"result": result[0]}, 201, {"Access-Control-Allow-Origin": "*"}
         except EmailNotVerified:
             return {
                 "error": "The given email has to be verified before being used."
