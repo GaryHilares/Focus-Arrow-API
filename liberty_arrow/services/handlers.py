@@ -14,6 +14,7 @@ from liberty_arrow.domain.commands import (
     SendConfirmationEmail,
     ConfirmEmail,
     SendCodeToEmail,
+    CheckEmailConfirmed,
 )
 
 
@@ -23,7 +24,7 @@ def send_confirmation_email(
     template_renderer: AbstractTemplateRenderer,
     uow: AbstractUnitOfWork,
     command: SendConfirmationEmail,
-):
+) -> None:
     email_history_record = uow.email_history.get_record_by_address(command.address)
     if uow.verified_emails.contains(VerifiedEmailEntry(command.address)) or (
         email_history_record is not None
@@ -38,11 +39,17 @@ def send_confirmation_email(
     )
 
 
-def confirm_email(uow: AbstractUnitOfWork, command: ConfirmEmail):
+def confirm_email(uow: AbstractUnitOfWork, command: ConfirmEmail) -> None:
     record = uow.email_history.get_record_by_token(command.code)
     if record is None or record.sent.date() != datetime.today().date():
         raise ConfirmationLinkNotValid
     uow.verified_emails.add(VerifiedEmailEntry(record.address))
+
+
+def check_email_confirmed(
+    uow: AbstractUnitOfWork, command: CheckEmailConfirmed
+) -> bool:
+    return uow.verified_emails.contains(VerifiedEmailEntry(command.email))
 
 
 def send_code_email(
@@ -51,7 +58,7 @@ def send_code_email(
     template_renderer: AbstractTemplateRenderer,
     uow: AbstractUnitOfWork,
     command: SendCodeToEmail,
-):
+) -> str:
     if not uow.verified_emails.contains(VerifiedEmailEntry(command.address)):
         raise EmailNotVerified
     token = token_generator.generate()

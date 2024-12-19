@@ -19,3 +19,8 @@ class ConfirmEmail(Command):
 @dataclass(frozen=True)
 class SendCodeToEmail(Command):
     address: str
+
+
+@dataclass(frozen=True)
+class CheckEmailConfirmed(Command):
+    address: str

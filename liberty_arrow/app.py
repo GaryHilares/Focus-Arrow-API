@@ -4,6 +4,7 @@ from liberty_arrow.domain.commands import (
     ConfirmEmail,
     SendCodeToEmail,
     SendConfirmationEmail,
+    CheckEmailConfirmed,
 )
 from liberty_arrow.domain.model import (
     ConfirmationEmailRateExceeded,
@@ -33,11 +34,20 @@ def create_app() -> Flask:
         bus = bootstrap.bootstrap()
         try:
             result = bus.handle_message(SendCodeToEmail(to_address))
-            return {"result": result[0]}, 201, {"Access-Control-Allow-Origin": "*"}
+            return {"result": result}, 201, {"Access-Control-Allow-Origin": "*"}
         except EmailNotVerified:
             return {
                 "error": "The given email has to be verified before being used."
             }, 403
+
+    @app.route("/check-email-confirmed")
+    def check_email_confirmed():
+        to_address = request.args.get("email")
+        if not to_address:
+            return {"error": "No email address included"}, 400
+        bus = bootstrap.bootstrap()
+        result = bus.handle_message(CheckEmailConfirmed(to_address))
+        return {"confirmed" > result}, 200
 
     @app.route("/email-confirmation")
     def email_confirmation():

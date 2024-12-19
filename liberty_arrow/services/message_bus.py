@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 from liberty_arrow.domain.commands import Command
 from liberty_arrow.services.uow import AbstractUnitOfWork
 
@@ -17,7 +17,7 @@ class MessageBus:
     def handle_command(self, command: Command):
         return self.command_handlers[type(command)](self.uow, command)
 
-    def handle_message(self, message: Message) -> List[Any]:
+    def handle_message(self, message: Message) -> Any:
         messages = [message]
         results = []
         while len(messages) > 0:
@@ -25,4 +25,4 @@ class MessageBus:
             if isinstance(to_handle, Command):
                 results.append(self.handle_command(to_handle))
             messages.extend(self.uow.flush_messages())
-        return results
+        return results[0]
