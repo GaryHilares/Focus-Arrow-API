@@ -7,17 +7,17 @@ class Command:
 
 
 @dataclass(frozen=True)
-class SendConfirmationEmail(Command):
+class SendVerificationEmail(Command):
     address: str
 
 
 @dataclass(frozen=True)
-class ConfirmEmail(Command):
-    code: str
+class VerifyEmail(Command):
+    token: str
 
 
 @dataclass(frozen=True)
-class SendCodeToEmail(Command):
+class SendTokenToEmail(Command):
     address: str
 
 

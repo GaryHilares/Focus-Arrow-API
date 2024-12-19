@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request
 from liberty_arrow import bootstrap
 from liberty_arrow.domain.commands import (
-    ConfirmEmail,
-    SendCodeToEmail,
-    SendConfirmationEmail,
+    VerifyEmail,
+    SendTokenToEmail,
+    SendVerificationEmail,
     CheckEmailConfirmed,
 )
 from liberty_arrow.domain.model import (
@@ -26,21 +26,21 @@ def create_app() -> Flask:
             f"block-screens/{block_screen_name}.html", message=message
         )
 
-    @app.route("/email-code")
-    def email_code():
+    @app.route("/send-token")
+    def email_token():
         to_address = request.args.get("email")
         if not to_address:
             return {"error": "No email address included"}, 400
         bus = bootstrap.bootstrap()
         try:
-            result = bus.handle_message(SendCodeToEmail(to_address))
+            result = bus.handle_message(SendTokenToEmail(to_address))
             return {"result": result}, 201, {"Access-Control-Allow-Origin": "*"}
         except EmailNotVerified:
             return {
                 "error": "The given email has to be verified before being used."
             }, 403
 
-    @app.route("/check-email-confirmed")
+    @app.route("/check-email")
     def check_email_confirmed():
         to_address = request.args.get("email")
         if not to_address:
@@ -49,14 +49,14 @@ def create_app() -> Flask:
         result = bus.handle_message(CheckEmailConfirmed(to_address))
         return {"confirmed" > result}, 200
 
-    @app.route("/email-confirmation")
-    def email_confirmation():
+    @app.route("/send-verification")
+    def email_verification():
         to_address = request.args.get("email")
         if not to_address:
             return {"error": "No email address included"}, 400
         bus = bootstrap.bootstrap()
         try:
-            bus.handle_message(SendConfirmationEmail(to_address))
+            bus.handle_message(SendVerificationEmail(to_address))
             return "OK", 201
         except ConfirmationEmailRateExceeded:
             return {
@@ -70,7 +70,7 @@ def create_app() -> Flask:
             return {"error": "No token included"}, 400
         bus = bootstrap.bootstrap()
         try:
-            bus.handle_message(ConfirmEmail(token))
+            bus.handle_message(VerifyEmail(token))
             return "OK", 201
         except ConfirmationLinkNotValid:
             return {"error": "Confirmation token does not exist or has expired."}, 404

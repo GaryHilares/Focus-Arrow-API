@@ -4,14 +4,16 @@ from liberty_arrow.adapters.templates import JinjaTemplateRenderer
 from liberty_arrow.adapters.token import RandomTokenGenerator
 from liberty_arrow.services.message_bus import MessageBus
 from liberty_arrow.domain.commands import (
-    ConfirmEmail,
-    SendCodeToEmail,
-    SendConfirmationEmail,
+    VerifyEmail,
+    SendTokenToEmail,
+    SendVerificationEmail,
+    CheckEmailConfirmed,
 )
 from liberty_arrow.services.handlers import (
     send_confirmation_email,
-    confirm_email,
-    send_code_email,
+    verify_email,
+    send_token_to_email,
+    check_email_confirmed,
 )
 from functools import partial
 from liberty_arrow.services.uow import MongoUnitOfWork
@@ -28,13 +30,14 @@ def bootstrap() -> MessageBus:
     template_renderer = JinjaTemplateRenderer(PackageLoader("liberty_arrow"))
 
     command_handlers = {
-        ConfirmEmail: confirm_email,
-        SendCodeToEmail: partial(
-            send_code_email, email_client, pin_generator, template_renderer
+        VerifyEmail: verify_email,
+        SendTokenToEmail: partial(
+            send_token_to_email, email_client, pin_generator, template_renderer
         ),
-        SendConfirmationEmail: partial(
+        SendVerificationEmail: partial(
             send_confirmation_email, email_client, pin_generator, template_renderer
         ),
+        CheckEmailConfirmed: check_email_confirmed,
     }
 
     return MessageBus(uow, command_handlers)

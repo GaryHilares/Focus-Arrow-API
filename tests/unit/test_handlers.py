@@ -5,9 +5,9 @@ from liberty_arrow.adapters.templates import AbstractTemplateRenderer
 from liberty_arrow.adapters.token import AbstractTokenGenerator
 from liberty_arrow.domain.commands import (
     Command,
-    ConfirmEmail,
-    SendCodeToEmail,
-    SendConfirmationEmail,
+    VerifyEmail,
+    SendTokenToEmail,
+    SendVerificationEmail,
 )
 from liberty_arrow.domain.model import (
     ConfirmationEmailRateExceeded,
@@ -108,7 +108,7 @@ def test_sends_confirmation_email():
     token_generator = FakeTokenGenerator()
     template_renderer = FakeTemplateRenderer()
     uow = FakeUnitOfWork()
-    command = SendConfirmationEmail("user@example.com")
+    command = SendVerificationEmail("user@example.com")
     handlers.send_confirmation_email(
         email_client, token_generator, template_renderer, uow, command
     )
@@ -125,8 +125,8 @@ def test_sends_confirmation_email_to_different_users():
     uow = FakeUnitOfWork()
     template_renderer = FakeTemplateRenderer()
     commands = [
-        SendConfirmationEmail("bob@example.com"),
-        SendConfirmationEmail("alice@example.com"),
+        SendVerificationEmail("bob@example.com"),
+        SendVerificationEmail("alice@example.com"),
     ]
     for command in commands:
         handlers.send_confirmation_email(
@@ -142,7 +142,7 @@ def test_does_not_spam_confirmation_email_to_same_user():
     email_client = FakeEmailClient()
     token_generator = FakeTokenGenerator()
     template_renderer = FakeTemplateRenderer()
-    command = SendConfirmationEmail("bob@example.com")
+    command = SendVerificationEmail("bob@example.com")
     with pytest.raises(ConfirmationEmailRateExceeded):
         for _ in range(1000):
             handlers.send_confirmation_email(
@@ -161,10 +161,10 @@ def test_does_not_confirms_email_with_non_existing_token():
         token_generator,
         template_renderer,
         uow,
-        SendConfirmationEmail("bob@example.com"),
+        SendVerificationEmail("bob@example.com"),
     )
     with pytest.raises(ConfirmationLinkNotValid):
-        handlers.confirm_email(uow, ConfirmEmail("NON_EXISTING_TOKEN"))
+        handlers.verify_email(uow, VerifyEmail("NON_EXISTING_TOKEN"))
     assert not uow.verified_emails.contains("bob@example.com")
 
 
@@ -178,9 +178,9 @@ def test_confirms_email_with_right_token():
         token_generator,
         template_renderer,
         uow,
-        SendConfirmationEmail("bob@example.com"),
+        SendVerificationEmail("bob@example.com"),
     )
-    handlers.confirm_email(uow, ConfirmEmail("FAKE_TOKEN"))
+    handlers.verify_email(uow, VerifyEmail("FAKE_TOKEN"))
     assert uow.verified_emails.contains(VerifiedEmailEntry("bob@example.com"))
 
 
@@ -194,15 +194,15 @@ def test_sends_code_to_verified_email():
         token_generator,
         template_renderer,
         uow,
-        SendConfirmationEmail("bob@example.com"),
+        SendVerificationEmail("bob@example.com"),
     )
-    handlers.confirm_email(uow, ConfirmEmail("FAKE_TOKEN"))
-    code = handlers.send_code_email(
+    handlers.verify_email(uow, VerifyEmail("FAKE_TOKEN"))
+    code = handlers.send_token_to_email(
         email_client,
         token_generator,
         template_renderer,
         uow,
-        SendCodeToEmail("bob@example.com"),
+        SendTokenToEmail("bob@example.com"),
     )
     assert "bob@example.com" == email_client.sent[0]["to_address"]
     assert code in email_client.sent[0]["content"]
@@ -214,11 +214,11 @@ def test_does_not_send_code_to_unverified_email():
     token_generator = FakeTokenGenerator()
     template_renderer = FakeTemplateRenderer()
     with pytest.raises(EmailNotVerified):
-        handlers.send_code_email(
+        handlers.send_token_to_email(
             email_client,
             token_generator,
             template_renderer,
             uow,
-            SendCodeToEmail("bob@example.com"),
+            SendTokenToEmail("bob@example.com"),
         )
     assert len(email_client.sent) == 0
