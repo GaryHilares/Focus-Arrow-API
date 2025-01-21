@@ -25,7 +25,7 @@ def bootstrap() -> MessageBus:
     URL = f"mongodb+srv://{getenv('MONGODB_USER')}:{getenv('MONGODB_PASSWORD')}@{getenv('MONGODB_HOST')}/?retryWrites=true&w=majority"
     conn_pool = MongoClient(URL)
     uow = MongoUnitOfWork(conn_pool)
-    email_client = GmailClient(getenv("GMAIL_USERNAME"), getenv("GMAIL_APP_PASSWORD"))
+    email_client = GmailClient(getenv("GMAIL_USERNAME"), getenv("GMAIL_PASSWORD"))
     pin_generator = RandomTokenGenerator()
     template_renderer = JinjaTemplateRenderer(PackageLoader("liberty_arrow"))
 

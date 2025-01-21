@@ -47,7 +47,7 @@ def create_app() -> Flask:
             return {"error": "No email address included"}, 400
         bus = bootstrap.bootstrap()
         result = bus.handle_message(CheckEmailConfirmed(to_address))
-        return {"confirmed" > result}, 200
+        return {"confirmed": result}, 200
 
     @app.route("/send-verification")
     def email_verification():

@@ -49,7 +49,7 @@ def verify_email(uow: AbstractUnitOfWork, command: VerifyEmail) -> None:
 def check_email_confirmed(
     uow: AbstractUnitOfWork, command: CheckEmailConfirmed
 ) -> bool:
-    return uow.verified_emails.contains(VerifiedEmailEntry(command.email))
+    return uow.verified_emails.contains(VerifiedEmailEntry(command.address))
 
 
 def send_token_to_email(
