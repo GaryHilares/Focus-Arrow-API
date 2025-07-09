@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 from pymongo import MongoClient
-from liberty_arrow.domain.commands import Command
-from liberty_arrow.services.repositories import (
+from focus_arrow.domain.commands import Command
+from focus_arrow.services.repositories import (
     AbstractEmailHistoryRepository,
     AbstractVerifiedEmailRepository,
     MongoEmailHistoryRepository,

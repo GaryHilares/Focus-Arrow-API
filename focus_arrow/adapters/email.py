@@ -5,7 +5,7 @@ from email.mime import multipart, text
 
 class AbstractEmailClient(ABC):
     @abstractmethod
-    def send(to_address: str, subject: str, message: str):
+    def send(self, to_address: str, subject: str, content: str):
         raise NotImplementedError
 
 

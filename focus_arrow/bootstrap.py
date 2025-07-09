@@ -1,22 +1,24 @@
 from jinja2 import PackageLoader
-from liberty_arrow.adapters.email import GmailClient
-from liberty_arrow.adapters.templates import JinjaTemplateRenderer
-from liberty_arrow.adapters.token import RandomTokenGenerator
-from liberty_arrow.services.message_bus import MessageBus
-from liberty_arrow.domain.commands import (
+from focus_arrow.adapters.email import GmailClient
+from focus_arrow.adapters.templates import JinjaTemplateRenderer
+from focus_arrow.adapters.token import RandomTokenGenerator
+from focus_arrow.services.message_bus import MessageBus
+from focus_arrow.domain.commands import (
     VerifyEmail,
     SendTokenToEmail,
     SendVerificationEmail,
     CheckEmailConfirmed,
+    SendUninstallationEmail,
 )
-from liberty_arrow.services.handlers import (
+from focus_arrow.services.handlers import (
     send_confirmation_email,
     verify_email,
     send_token_to_email,
     check_email_confirmed,
+    send_uninstallation_email,
 )
 from functools import partial
-from liberty_arrow.services.uow import MongoUnitOfWork
+from focus_arrow.services.uow import MongoUnitOfWork
 from os import getenv
 from pymongo import MongoClient
 
@@ -27,7 +29,7 @@ def bootstrap() -> MessageBus:
     uow = MongoUnitOfWork(conn_pool)
     email_client = GmailClient(getenv("GMAIL_USERNAME"), getenv("GMAIL_PASSWORD"))
     pin_generator = RandomTokenGenerator()
-    template_renderer = JinjaTemplateRenderer(PackageLoader("liberty_arrow"))
+    template_renderer = JinjaTemplateRenderer(PackageLoader("focus_arrow"))
 
     command_handlers = {
         VerifyEmail: verify_email,
@@ -38,6 +40,9 @@ def bootstrap() -> MessageBus:
             send_confirmation_email, email_client, pin_generator, template_renderer
         ),
         CheckEmailConfirmed: check_email_confirmed,
+        SendUninstallationEmail: partial(
+            send_uninstallation_email, email_client, template_renderer
+        ),
     }
 
     return MessageBus(uow, command_handlers)

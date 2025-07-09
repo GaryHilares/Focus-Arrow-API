@@ -1,27 +1,26 @@
-from audioop import add
 from typing import Literal, List, Optional
-from liberty_arrow.adapters.email import AbstractEmailClient
-from liberty_arrow.adapters.templates import AbstractTemplateRenderer
-from liberty_arrow.adapters.token import AbstractTokenGenerator
-from liberty_arrow.domain.commands import (
+from focus_arrow.adapters.email import AbstractEmailClient
+from focus_arrow.adapters.templates import AbstractTemplateRenderer
+from focus_arrow.adapters.token import AbstractTokenGenerator
+from focus_arrow.domain.commands import (
     Command,
     VerifyEmail,
     SendTokenToEmail,
     SendVerificationEmail,
 )
-from liberty_arrow.domain.model import (
+from focus_arrow.domain.model import (
     ConfirmationEmailRateExceeded,
     ConfirmationLinkNotValid,
     EmailNotVerified,
     VerificationEmailHistoryEntry,
     VerifiedEmailEntry,
 )
-from liberty_arrow.services import handlers
-from liberty_arrow.services.repositories import (
+from focus_arrow.services import handlers
+from focus_arrow.services.repositories import (
     AbstractEmailHistoryRepository,
     AbstractVerifiedEmailRepository,
 )
-from liberty_arrow.services.uow import AbstractUnitOfWork
+from focus_arrow.services.uow import AbstractUnitOfWork
 import pytest
 
 

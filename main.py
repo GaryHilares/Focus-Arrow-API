@@ -1,4 +1,4 @@
-from liberty_arrow.app import create_app
+from focus_arrow.app import create_app
 from dotenv import load_dotenv
 
 load_dotenv(".env")

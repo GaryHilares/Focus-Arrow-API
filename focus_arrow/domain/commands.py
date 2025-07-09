@@ -24,3 +24,8 @@ class SendTokenToEmail(Command):
 @dataclass(frozen=True)
 class CheckEmailConfirmed(Command):
     address: str
+
+
+@dataclass(frozen=True)
+class SendUninstallationEmail(Command):
+    address: str

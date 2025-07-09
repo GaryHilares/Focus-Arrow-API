@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request
-from liberty_arrow import bootstrap
-from liberty_arrow.domain.commands import (
+from focus_arrow import bootstrap
+from focus_arrow.domain.commands import (
     VerifyEmail,
     SendTokenToEmail,
     SendVerificationEmail,
     CheckEmailConfirmed,
+    SendUninstallationEmail,
 )
-from liberty_arrow.domain.model import (
+from focus_arrow.domain.model import (
     ConfirmationEmailRateExceeded,
     ConfirmationLinkNotValid,
     EmailNotVerified,
@@ -74,5 +75,16 @@ def create_app() -> Flask:
             return "OK", 201
         except ConfirmationLinkNotValid:
             return {"error": "Confirmation token does not exist or has expired."}, 404
+
+    @app.route("/uninstall")
+    def uninstall():
+        email = request.args.get("email")
+        if email:
+            try:
+                bus = bootstrap.bootstrap()
+                bus.handle_message(SendUninstallationEmail(email))
+            except EmailNotVerified:
+                return "Email is not verified", 403
+        return "OK", 201
 
     return app

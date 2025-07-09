@@ -1,7 +1,7 @@
 import datetime
 import pytest
-from liberty_arrow.domain.model import VerificationEmailHistoryEntry, VerifiedEmailEntry
-from liberty_arrow.services import repositories
+from focus_arrow.domain.model import VerificationEmailHistoryEntry, VerifiedEmailEntry
+from focus_arrow.services import repositories
 from dotenv import load_dotenv
 from os import getenv
 from pymongo import MongoClient

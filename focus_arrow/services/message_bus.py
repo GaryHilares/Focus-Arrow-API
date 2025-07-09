@@ -1,6 +1,6 @@
 from typing import Any, Callable, Dict
-from liberty_arrow.domain.commands import Command
-from liberty_arrow.services.uow import AbstractUnitOfWork
+from focus_arrow.domain.commands import Command
+from focus_arrow.services.uow import AbstractUnitOfWork
 
 Message = Command
 

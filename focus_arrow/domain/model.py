@@ -5,7 +5,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class VerifiedEmailEntry:
     """
-    Records an email that is verified to receive emails from Liberty Arrow.
+    Records an email that is verified to receive emails from Focus Arrow.
     """
 
     address: str
@@ -14,7 +14,7 @@ class VerifiedEmailEntry:
 @dataclass(frozen=True)
 class VerificationEmailHistoryEntry:
     """
-    Records the last time that an email was sent by Liberty Arrow to the given address.
+    Records the last time that an email was sent by Focus Arrow to the given address.
     """
 
     address: str

@@ -1,20 +1,21 @@
 from datetime import datetime
-from liberty_arrow.adapters.token import AbstractTokenGenerator
-from liberty_arrow.adapters.email import AbstractEmailClient
-from liberty_arrow.adapters.templates import AbstractTemplateRenderer
-from liberty_arrow.domain.model import (
+from focus_arrow.adapters.token import AbstractTokenGenerator
+from focus_arrow.adapters.email import AbstractEmailClient
+from focus_arrow.adapters.templates import AbstractTemplateRenderer
+from focus_arrow.domain.model import (
     ConfirmationEmailRateExceeded,
     ConfirmationLinkNotValid,
     EmailNotVerified,
     VerificationEmailHistoryEntry,
     VerifiedEmailEntry,
 )
-from liberty_arrow.services.uow import AbstractUnitOfWork
-from liberty_arrow.domain.commands import (
+from focus_arrow.services.uow import AbstractUnitOfWork
+from focus_arrow.domain.commands import (
     SendVerificationEmail,
     VerifyEmail,
     SendTokenToEmail,
     CheckEmailConfirmed,
+    SendUninstallationEmail,
 )
 
 
@@ -33,7 +34,7 @@ def send_confirmation_email(
         raise ConfirmationEmailRateExceeded
     token = token_generator.generate()
     content = template_renderer.render("emails/confirmation.html", token=token)
-    email_client.send(command.address, "Confirm your Liberty Arrow token", content)
+    email_client.send(command.address, "Confirm your Focus Arrow token", content)
     uow.email_history.add_record(
         VerificationEmailHistoryEntry(command.address, datetime.now(), token)
     )
@@ -63,5 +64,17 @@ def send_token_to_email(
         raise EmailNotVerified
     token = token_generator.generate()
     content = template_renderer.render("emails/token.html", token=token)
-    email_client.send(command.address, "Liberty Arrow token", content)
+    email_client.send(command.address, "Focus Arrow token", content)
     return token
+
+
+def send_uninstallation_email(
+    email_client: AbstractEmailClient,
+    template_renderer: AbstractTemplateRenderer,
+    uow: AbstractUnitOfWork,
+    command: SendUninstallationEmail,
+):
+    if not uow.verified_emails.contains(VerifiedEmailEntry(command.address)):
+        raise EmailNotVerified
+    content = template_renderer.render("emails/uninstallation.html")
+    email_client.send(command.address, "Focus Arrow was uninstalled", content)

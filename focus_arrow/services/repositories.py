@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 import pymongo
-from liberty_arrow.domain.model import VerifiedEmailEntry, VerificationEmailHistoryEntry
+from focus_arrow.domain.model import VerifiedEmailEntry, VerificationEmailHistoryEntry
 
 
 class AbstractVerifiedEmailRepository(ABC):
@@ -16,7 +16,7 @@ class AbstractVerifiedEmailRepository(ABC):
 
 class MongoVerifiedEmailRepository(AbstractVerifiedEmailRepository):
     def __init__(self, conn_pool: pymongo.MongoClient):
-        db_conn = conn_pool["Liberty-Arrow"]
+        db_conn = conn_pool["Focus-Arrow"]
         self._collection = db_conn["verified-emails"]
 
     def contains(self, entry: VerifiedEmailEntry) -> bool:
@@ -47,7 +47,7 @@ class AbstractEmailHistoryRepository(ABC):
 
 class MongoEmailHistoryRepository(AbstractEmailHistoryRepository):
     def __init__(self, conn_pool: pymongo.MongoClient):
-        db_conn = conn_pool["Liberty-Arrow"]
+        db_conn = conn_pool["Focus-Arrow"]
         self._collection = db_conn["verification-email-history"]
 
     def add_record(self, entry: VerificationEmailHistoryEntry) -> None:
