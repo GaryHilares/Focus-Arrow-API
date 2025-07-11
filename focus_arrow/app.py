@@ -12,10 +12,12 @@ from focus_arrow.domain.model import (
     ConfirmationLinkNotValid,
     EmailNotVerified,
 )
+from flask_cors import CORS
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
+    CORS(app)
 
     @app.route("/block-screens/<block_screen_name>")
     def render_block_screen(block_screen_name):
