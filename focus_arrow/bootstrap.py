@@ -18,15 +18,13 @@ from focus_arrow.services.handlers import (
     send_uninstallation_email,
 )
 from functools import partial
-from focus_arrow.services.uow import MongoUnitOfWork
+from focus_arrow.services.uow import PostgreUnitOfWork
 from os import getenv
-from pymongo import MongoClient
 
 
 def bootstrap() -> MessageBus:
-    URL = f"mongodb+srv://{getenv('MONGODB_USER')}:{getenv('MONGODB_PASSWORD')}@{getenv('MONGODB_HOST')}/?retryWrites=true&w=majority"
-    conn_pool = MongoClient(URL)
-    uow = MongoUnitOfWork(conn_pool)
+    conn_str = getenv("SUPABASE_CONN_STR")
+    uow = PostgreUnitOfWork(conn_str)
     email_client = GmailClient(getenv("GMAIL_USERNAME"), getenv("GMAIL_PASSWORD"))
     pin_generator = RandomTokenGenerator()
     template_renderer = JinjaTemplateRenderer(PackageLoader("focus_arrow"))

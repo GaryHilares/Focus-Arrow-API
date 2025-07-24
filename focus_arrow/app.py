@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from flask_cors import CORS
 from focus_arrow import bootstrap
 from focus_arrow.domain.commands import (
     VerifyEmail,
@@ -12,7 +13,6 @@ from focus_arrow.domain.model import (
     ConfirmationLinkNotValid,
     EmailNotVerified,
 )
-from flask_cors import CORS
 
 
 def create_app() -> Flask:

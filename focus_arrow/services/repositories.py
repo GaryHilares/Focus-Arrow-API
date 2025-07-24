@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 import pymongo
+import psycopg
+from psycopg.rows import dict_row
 from focus_arrow.domain.model import VerifiedEmailEntry, VerificationEmailHistoryEntry
 
 
@@ -25,6 +27,29 @@ class MongoVerifiedEmailRepository(AbstractVerifiedEmailRepository):
     def add(self, entry: VerifiedEmailEntry) -> None:
         if not self.contains(entry):
             self._collection.insert_one({"address": entry.address})
+
+
+class PostgreVerifiedEmailRepository(AbstractVerifiedEmailRepository):
+    def __init__(self, conn_str: str):
+        self.conn_str = conn_str
+
+    def contains(self, entry: VerifiedEmailEntry) -> bool:
+        with psycopg.connect(self.conn_str) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT * FROM verified_emails WHERE email_address = %s;",
+                    (entry.address,),
+                )
+                result = cur.fetchone()
+        return result is not None
+
+    def add(self, entry: VerifiedEmailEntry) -> None:
+        with psycopg.connect(self.conn_str) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO verified_emails (email_address) VALUES (%s);",
+                    (entry.address,),
+                )
 
 
 class AbstractEmailHistoryRepository(ABC):
@@ -75,4 +100,56 @@ class MongoEmailHistoryRepository(AbstractEmailHistoryRepository):
             return None
         return VerificationEmailHistoryEntry(
             address=record["address"], sent=record["sent"], token=record["token"]
+        )
+
+
+class PostgreEmailHistoryRepository(AbstractEmailHistoryRepository):
+    def __init__(self, conn_str: str):
+        self.conn_str = conn_str
+
+    def add_record(self, entry: VerificationEmailHistoryEntry) -> None:
+        with psycopg.connect(self.conn_str) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO verification_email_history (address, sent, token)
+                            VALUES (%s, %s, %s);
+                """,
+                    (entry.address, entry.sent, entry.token),
+                )
+
+    def get_record_by_address(
+        self, address: str
+    ) -> Optional[VerificationEmailHistoryEntry]:
+        with psycopg.connect(self.conn_str) as conn:
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(
+                    """
+                    SELECT * FROM verification_email_history WHERE address = %s ORDER BY sent DESC;
+                """,
+                    (address,),
+                )
+                result = cur.fetchone()
+        if result is None:
+            return None
+        return VerificationEmailHistoryEntry(
+            address=result["address"], sent=result["sent"], token=result["token"]
+        )
+
+    def get_record_by_token(
+        self, token: str
+    ) -> Optional[VerificationEmailHistoryEntry]:
+        with psycopg.connect(self.conn_str) as conn:
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(
+                    """
+                    SELECT * FROM verification_email_history WHERE token = %s ORDER BY sent DESC;
+                """,
+                    (token,),
+                )
+                result = cur.fetchone()
+        if result is None:
+            return None
+        return VerificationEmailHistoryEntry(
+            address=result["address"], sent=result["sent"], token=result["token"]
         )
